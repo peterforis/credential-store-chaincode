@@ -40,12 +40,12 @@ public final class CredentialTransfer implements ContractInterface {
     public void InitLedger(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
 
-        CreateCredential(ctx, "credential1", "owner1", "credential-value-1");
-        CreateCredential(ctx, "credential2", "owner2", "credential-value-2");
-        CreateCredential(ctx, "credential3", "owner3", "credential-value-3");
-        CreateCredential(ctx, "credential4", "owner4", "credential-value-4");
-        CreateCredential(ctx, "credential5", "owner5", "credential-value-5");
-        CreateCredential(ctx, "credential6", "owner6", "credential-value-6");
+        CreateCredential(ctx, "credential1", "credential-name-1", "owner1", "credential-value-1");
+        CreateCredential(ctx, "credential2", "credential-name-2", "owner2", "credential-value-2");
+        CreateCredential(ctx, "credential3", "credential-name-3", "owner3", "credential-value-3");
+        CreateCredential(ctx, "credential4", "credential-name-4", "owner4", "credential-value-4");
+        CreateCredential(ctx, "credential5", "credential-name-5", "owner5", "credential-value-5");
+        CreateCredential(ctx, "credential6", "credential-name-6", "owner6", "credential-value-6");
     }
 
     /**
@@ -53,12 +53,12 @@ public final class CredentialTransfer implements ContractInterface {
      *
      * @param ctx             the transaction context
      * @param credentialID    the ID of the new credential
-     * @param owner           the owner of the new credential
+     * @param credentialOwner the credentialOwner of the new credential
      * @param credentialValue the credentialValue of the new credential
      * @return the created credential
      */
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public Credential CreateCredential(final Context ctx, final String credentialID, final String owner, final String credentialValue) {
+    public Credential CreateCredential(final Context ctx, final String credentialID, final String credentialName, final String credentialOwner, final String credentialValue) {
         ChaincodeStub stub = ctx.getStub();
 
         if (CredentialExists(ctx, credentialID)) {
@@ -66,7 +66,7 @@ public final class CredentialTransfer implements ContractInterface {
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_ALREADY_EXISTS.toString());
         }
-        Credential credential = new Credential(credentialID, owner, credentialValue);
+        Credential credential = new Credential(credentialID, credentialName, credentialOwner, credentialValue);
         String sortedJson = genson.serialize(credential);
         System.out.println(sortedJson);
         stub.putStringState(credentialID, sortedJson);
@@ -101,12 +101,12 @@ public final class CredentialTransfer implements ContractInterface {
      *
      * @param ctx             the transaction context
      * @param credentialID    the ID of the credential being updated
-     * @param owner           the owner of the credential being updated
+     * @param credentialOwner the credentialOwner of the credential being updated
      * @param credentialValue the credentialValue of the credential being updated
      * @return the transferred credential
      */
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public Credential UpdateCredential(final Context ctx, final String credentialID, final String owner, final String credentialValue) {
+    public Credential UpdateCredential(final Context ctx, final String credentialID, final String credentialName, final String credentialOwner, final String credentialValue) {
 //        String initiatorName = getInitiator(ctx);
 
         ChaincodeStub stub = ctx.getStub();
@@ -117,7 +117,7 @@ public final class CredentialTransfer implements ContractInterface {
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_NOT_FOUND.toString());
         }
 
-        Credential newCredential = new Credential(credentialID, owner, credentialValue);
+        Credential newCredential = new Credential(credentialID, credentialName, credentialOwner, credentialValue);
         String sortedJson = genson.serialize(newCredential);
         stub.putStringState(credentialID, sortedJson);
         return newCredential;

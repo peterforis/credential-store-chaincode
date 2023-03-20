@@ -11,15 +11,15 @@ public final class CredentialTest {
 
         @Test
         public void isReflexive() {
-            Credential credential = new Credential("credential1", "owner1", "credential-value-test");
+            Credential credential = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
 
             assertThat(credential).isEqualTo(credential);
         }
 
         @Test
         public void isSymmetric() {
-            Credential credentialA = new Credential("credential1", "owner1", "credential-value-test");
-            Credential credentialB = new Credential("credential1", "owner1", "credential-value-test");
+            Credential credentialA = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
+            Credential credentialB = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
 
             assertThat(credentialA).isEqualTo(credentialB);
             assertThat(credentialB).isEqualTo(credentialA);
@@ -27,9 +27,9 @@ public final class CredentialTest {
 
         @Test
         public void isTransitive() {
-            Credential credentialA = new Credential("credential1", "owner1", "credential-value-test");
-            Credential credentialB = new Credential("credential1", "owner1", "credential-value-test");
-            Credential credentialC = new Credential("credential1", "owner1", "credential-value-test");
+            Credential credentialA = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
+            Credential credentialB = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
+            Credential credentialC = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
 
             assertThat(credentialA).isEqualTo(credentialB);
             assertThat(credentialB).isEqualTo(credentialC);
@@ -38,15 +38,15 @@ public final class CredentialTest {
 
         @Test
         public void handlesInequality() {
-            Credential credentialA = new Credential("credential1", "owner1", "credential-value-test");
-            Credential credentialB = new Credential("credential2", "owner1", "credential-value-test");
+            Credential credentialA = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
+            Credential credentialB = new Credential("credential2", "credential-name-2", "owner1", "credential-value-test");
 
             assertThat(credentialA).isNotEqualTo(credentialB);
         }
 
         @Test
         public void handlesOtherObjects() {
-            Credential credentialA = new Credential("credential1", "owner1", "credential-value-test");
+            Credential credentialA = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
             String credentialB = "this is not a credential";
 
             assertThat(credentialA).isNotEqualTo(credentialB);
@@ -54,7 +54,7 @@ public final class CredentialTest {
 
         @Test
         public void handlesNull() {
-            Credential credential = new Credential("credential1", "owner1", "credential-value-test");
+            Credential credential = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
 
             assertThat(credential).isNotEqualTo(null);
         }
@@ -62,8 +62,8 @@ public final class CredentialTest {
 
     @Test
     public void toStringIdentifiesCredential() {
-        Credential credential = new Credential("credential1", "owner1", "credential-value-test");
+        Credential credential = new Credential("credential1", "credential-name-1", "owner1", "credential-value-test");
 
-        assertThat(credential.toString()).isEqualTo("Credential@b7f5b31f [credentialID=credential1, owner=owner1, credentialValue=credential-value-test]");
+        assertThat(credential.toString()).isEqualTo("Credential@b7f5b31f [credentialID=credential1, credentialName=credential-name-1, credentialOwner=owner1, credentialValue=credential-value-test]");
     }
 }

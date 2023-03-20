@@ -59,17 +59,17 @@ public final class CredentialTransferTest {
             credentialList = new ArrayList<KeyValue>();
 
             credentialList.add(new MockKeyValue("credential1",
-                    "{ \"credentialID\": \"credential1\", \"owner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }"));
+                    "{ \"credentialID\": \"credential1\", \"credentialName\": \"credential-name-1\", \"credentialOwner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }"));
             credentialList.add(new MockKeyValue("credential2",
-                    "{ \"credentialID\": \"credential2\", \"owner\": \"owner2\", \"credentialValue\": \"credential-value-2\" }"));
+                    "{ \"credentialID\": \"credential2\", \"credentialName\": \"credential-name-2\", \"credentialOwner\": \"owner2\", \"credentialValue\": \"credential-value-2\" }"));
             credentialList.add(new MockKeyValue("credential3",
-                    "{ \"credentialID\": \"credential3\", \"owner\": \"owner3\", \"credentialValue\": \"credential-value-3\" }"));
+                    "{ \"credentialID\": \"credential3\", \"credentialName\": \"credential-name-3\", \"credentialOwner\": \"owner3\", \"credentialValue\": \"credential-value-3\" }"));
             credentialList.add(new MockKeyValue("credential4",
-                    "{ \"credentialID\": \"credential4\", \"owner\": \"owner4\", \"credentialValue\": \"credential-value-4\" }"));
+                    "{ \"credentialID\": \"credential4\", \"credentialName\": \"credential-name-4\", \"credentialOwner\": \"owner4\", \"credentialValue\": \"credential-value-4\" }"));
             credentialList.add(new MockKeyValue("credential5",
-                    "{ \"credentialID\": \"credential5\", \"owner\": \"owner5\", \"credentialValue\": \"credential-value-5\" }"));
+                    "{ \"credentialID\": \"credential5\", \"credentialName\": \"credential-name-5\", \"credentialOwner\": \"owner5\", \"credentialValue\": \"credential-value-5\" }"));
             credentialList.add(new MockKeyValue("credential6",
-                    "{ \"credentialID\": \"credential6\", \"owner\": \"owner6\", \"credentialValue\": \"credential-value-6\" }"));
+                    "{ \"credentialID\": \"credential6\", \"credentialName\": \"credential-name-6\", \"credentialOwner\": \"owner6\", \"credentialValue\": \"credential-value-6\" }"));
         }
 
         @Override
@@ -110,11 +110,11 @@ public final class CredentialTransferTest {
             ChaincodeStub stub = mock(ChaincodeStub.class);
             when(ctx.getStub()).thenReturn(stub);
             when(stub.getStringState("credential1"))
-                    .thenReturn("{ \"credentialID\": \"credential1\", \"owner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }");
+                    .thenReturn("{ \"credentialID\": \"credential1\", \"credentialName\": \"credential-name-1\", \"credentialOwner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }");
 
             Credential credential = contract.ReadCredential(ctx, "credential1");
 
-            assertThat(credential).isEqualTo(new Credential("credential1", "owner1", "credential-value-1"));
+            assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-1"));
         }
 
         @Test
@@ -147,12 +147,12 @@ public final class CredentialTransferTest {
 
         InOrder inOrder = inOrder(stub);
 
-        inOrder.verify(stub).putStringState("credential1", "{\"credentialID\":\"credential1\",\"credentialValue\":\"credential-value-1\",\"owner\":\"owner1\"}");
-        inOrder.verify(stub).putStringState("credential2", "{\"credentialID\":\"credential2\",\"credentialValue\":\"credential-value-2\",\"owner\":\"owner2\"}");
-        inOrder.verify(stub).putStringState("credential3", "{\"credentialID\":\"credential3\",\"credentialValue\":\"credential-value-3\",\"owner\":\"owner3\"}");
-        inOrder.verify(stub).putStringState("credential4", "{\"credentialID\":\"credential4\",\"credentialValue\":\"credential-value-4\",\"owner\":\"owner4\"}");
-        inOrder.verify(stub).putStringState("credential5", "{\"credentialID\":\"credential5\",\"credentialValue\":\"credential-value-5\",\"owner\":\"owner5\"}");
-        inOrder.verify(stub).putStringState("credential6", "{\"credentialID\":\"credential6\",\"credentialValue\":\"credential-value-6\",\"owner\":\"owner6\"}");
+        inOrder.verify(stub).putStringState("credential1", "{\"credentialID\":\"credential1\",\"credentialName\":\"credential-name-1\",\"credentialOwner\":\"owner1\",\"credentialValue\":\"credential-value-1\"}");
+        inOrder.verify(stub).putStringState("credential2", "{\"credentialID\":\"credential2\",\"credentialName\":\"credential-name-2\",\"credentialOwner\":\"owner2\",\"credentialValue\":\"credential-value-2\"}");
+        inOrder.verify(stub).putStringState("credential3", "{\"credentialID\":\"credential3\",\"credentialName\":\"credential-name-3\",\"credentialOwner\":\"owner3\",\"credentialValue\":\"credential-value-3\"}");
+        inOrder.verify(stub).putStringState("credential4", "{\"credentialID\":\"credential4\",\"credentialName\":\"credential-name-4\",\"credentialOwner\":\"owner4\",\"credentialValue\":\"credential-value-4\"}");
+        inOrder.verify(stub).putStringState("credential5", "{\"credentialID\":\"credential5\",\"credentialName\":\"credential-name-5\",\"credentialOwner\":\"owner5\",\"credentialValue\":\"credential-value-5\"}");
+        inOrder.verify(stub).putStringState("credential6", "{\"credentialID\":\"credential6\",\"credentialName\":\"credential-name-6\",\"credentialOwner\":\"owner6\",\"credentialValue\":\"credential-value-6\"}");
     }
 
     @Nested
@@ -168,7 +168,7 @@ public final class CredentialTransferTest {
                     .thenReturn("{\"credentialID\":\"credential1\",\"owner\":\"owner1\",\"credentialValue\":\"credential-value-1\"}");
 
             Throwable thrown = catchThrowable(() -> {
-                contract.CreateCredential(ctx, "credential1", "owner1", "credential-value-1");
+                contract.CreateCredential(ctx, "credential1", "credential-name-1", "owner1", "credential-value-1");
             });
 
             assertThat(thrown).isInstanceOf(ChaincodeException.class).hasNoCause()
@@ -185,9 +185,9 @@ public final class CredentialTransferTest {
             when(ctx.getStub()).thenReturn(stub);
             when(stub.getStringState("credential1")).thenReturn("");
 
-            Credential credential = contract.CreateCredential(ctx, "credential1", "owner1", "credential-value-1");
+            Credential credential = contract.CreateCredential(ctx, "credential1", "credential-name-1",  "owner1", "credential-value-1");
 
-            assertThat(credential).isEqualTo(new Credential("credential1", "owner1", "credential-value-1"));
+            assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-1"));
         }
     }
 
@@ -204,12 +204,12 @@ public final class CredentialTransferTest {
         System.out.println(credentials);
 
         assertThat(credentials).isEqualTo(
-                "[{\"credentialID\":\"credential1\",\"credentialValue\":\"credential-value-1\",\"owner\":\"owner1\"},"
-                        + "{\"credentialID\":\"credential2\",\"credentialValue\":\"credential-value-2\",\"owner\":\"owner2\"},"
-                        + "{\"credentialID\":\"credential3\",\"credentialValue\":\"credential-value-3\",\"owner\":\"owner3\"},"
-                        + "{\"credentialID\":\"credential4\",\"credentialValue\":\"credential-value-4\",\"owner\":\"owner4\"},"
-                        + "{\"credentialID\":\"credential5\",\"credentialValue\":\"credential-value-5\",\"owner\":\"owner5\"},"
-                        + "{\"credentialID\":\"credential6\",\"credentialValue\":\"credential-value-6\",\"owner\":\"owner6\"}]"
+                "[{\"credentialID\":\"credential1\",\"credentialName\":\"credential-name-1\",\"credentialOwner\":\"owner1\",\"credentialValue\":\"credential-value-1\"},"
+                        + "{\"credentialID\":\"credential2\",\"credentialName\":\"credential-name-2\",\"credentialOwner\":\"owner2\",\"credentialValue\":\"credential-value-2\"},"
+                        + "{\"credentialID\":\"credential3\",\"credentialName\":\"credential-name-3\",\"credentialOwner\":\"owner3\",\"credentialValue\":\"credential-value-3\"},"
+                        + "{\"credentialID\":\"credential4\",\"credentialName\":\"credential-name-4\",\"credentialOwner\":\"owner4\",\"credentialValue\":\"credential-value-4\"},"
+                        + "{\"credentialID\":\"credential5\",\"credentialName\":\"credential-name-5\",\"credentialOwner\":\"owner5\",\"credentialValue\":\"credential-value-5\"},"
+                        + "{\"credentialID\":\"credential6\",\"credentialName\":\"credential-name-6\",\"credentialOwner\":\"owner6\",\"credentialValue\":\"credential-value-6\"}]"
         );
     }
 
@@ -225,9 +225,9 @@ public final class CredentialTransferTest {
             when(stub.getStringState("credential1"))
                     .thenReturn("{ \"credentialID\": \"credential1\", \"owner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }");
 
-            Credential credential = contract.UpdateCredential(ctx, "credential1", "owner1", "credential-value-New");
+            Credential credential = contract.UpdateCredential(ctx, "credential1", "credential-name-1", "owner1", "credential-value-New");
 
-            assertThat(credential).isEqualTo(new Credential("credential1", "owner1", "credential-value-New"));
+            assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-New"));
         }
     }
 

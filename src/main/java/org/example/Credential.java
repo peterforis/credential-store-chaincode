@@ -13,7 +13,10 @@ public final class Credential {
     private final String credentialID;
 
     @Property()
-    private final String owner;
+    private final String credentialName;
+
+    @Property()
+    private final String credentialOwner;
 
     @Property()
     private final String credentialValue;
@@ -22,24 +25,29 @@ public final class Credential {
         return credentialID;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getCredentialName() {
+        return credentialName;
+    }
+
+    public String getCredentialOwner() {
+        return credentialOwner;
     }
 
     public String getCredentialValue() {
         return credentialValue;
     }
 
-    public Credential(@JsonProperty("credentialID") final String credentialID, @JsonProperty("owner") final String owner,
+    public Credential(@JsonProperty("credentialID") final String credentialID, @JsonProperty("credentialName") final String credentialName, @JsonProperty("credentialOwner") final String credentialOwner,
                       @JsonProperty("credentialValue") final String credentialValue) {
         this.credentialID = credentialID;
-        this.owner = owner;
+        this.credentialName = credentialName;
+        this.credentialOwner = credentialOwner;
         this.credentialValue = credentialValue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCredentialID(), getOwner(), getCredentialValue());
+        return Objects.hash(getCredentialID(), getCredentialOwner(), getCredentialValue());
     }
 
     @Override
@@ -55,13 +63,13 @@ public final class Credential {
         Credential other = (Credential) obj;
 
         return Objects.deepEquals(
-                new String[] {getCredentialID(), getOwner(), getCredentialValue()},
-                new String[] {other.getCredentialID(), other.getOwner(), getCredentialValue()});
+                new String[] {getCredentialID(), getCredentialName(), getCredentialOwner(), getCredentialValue()},
+                new String[] {other.getCredentialID(), other.getCredentialName(), other.getCredentialOwner(), getCredentialValue()});
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + " [credentialID=" + credentialID + ", owner=" + owner + ", credentialValue=" + credentialValue + "]";
+        return this.getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + " [credentialID=" + credentialID + ", credentialName=" + credentialName + ", credentialOwner=" + credentialOwner + ", credentialValue=" + credentialValue + "]";
     }
 }
 
