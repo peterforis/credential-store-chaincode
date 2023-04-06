@@ -63,8 +63,8 @@ public final class Credential {
         Credential other = (Credential) obj;
 
         return Objects.deepEquals(
-                new String[] {getCredentialID(), getCredentialName(), getCredentialOwner(), getCredentialValue()},
-                new String[] {other.getCredentialID(), other.getCredentialName(), other.getCredentialOwner(), getCredentialValue()});
+                new String[]{getCredentialID(), getCredentialName(), getCredentialOwner(), getCredentialValue()},
+                new String[]{other.getCredentialID(), other.getCredentialName(), other.getCredentialOwner(), getCredentialValue()});
     }
 
     @Override
