@@ -15,7 +15,7 @@ import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-@Contract(name = "basic")
+@Contract(name = "credential-store-chaincode")
 @Default
 public final class CredentialTransfer implements ContractInterface {
 
