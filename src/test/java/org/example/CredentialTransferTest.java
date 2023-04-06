@@ -19,6 +19,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 public final class CredentialTransferTest {
 
     private final class MockKeyValue implements KeyValue {
@@ -112,7 +113,7 @@ public final class CredentialTransferTest {
             when(stub.getStringState("credential1"))
                     .thenReturn("{ \"credentialID\": \"credential1\", \"credentialName\": \"credential-name-1\", \"credentialOwner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }");
 
-            Credential credential = contract.ReadCredential(ctx, "credential1");
+            Credential credential = contract.ReadCredential(ctx, "credential1", "owner1");
 
             assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-1"));
         }
@@ -126,7 +127,7 @@ public final class CredentialTransferTest {
             when(stub.getStringState("credential1")).thenReturn("");
 
             Throwable thrown = catchThrowable(() -> {
-                contract.ReadCredential(ctx, "credential1");
+                contract.ReadCredential(ctx, "credential1", "owner1");
             });
 
             assertThat(thrown).isInstanceOf(ChaincodeException.class).hasNoCause()
@@ -185,7 +186,7 @@ public final class CredentialTransferTest {
             when(ctx.getStub()).thenReturn(stub);
             when(stub.getStringState("credential1")).thenReturn("");
 
-            Credential credential = contract.CreateCredential(ctx, "credential1", "credential-name-1",  "owner1", "credential-value-1");
+            Credential credential = contract.CreateCredential(ctx, "credential1", "owner1", "credential-name-1", "credential-value-1");
 
             assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-1"));
         }
@@ -199,17 +200,11 @@ public final class CredentialTransferTest {
         when(ctx.getStub()).thenReturn(stub);
         when(stub.getStateByRange("", "")).thenReturn(new MockCredentialResultsIterator());
 
-        String credentials = contract.GetAllCredentials(ctx);
-
-        System.out.println(credentials);
+        String owner = "owner1";
+        String credentials = contract.GetAllCredentials(ctx, owner);
 
         assertThat(credentials).isEqualTo(
-                "[{\"credentialID\":\"credential1\",\"credentialName\":\"credential-name-1\",\"credentialOwner\":\"owner1\",\"credentialValue\":\"credential-value-1\"},"
-                        + "{\"credentialID\":\"credential2\",\"credentialName\":\"credential-name-2\",\"credentialOwner\":\"owner2\",\"credentialValue\":\"credential-value-2\"},"
-                        + "{\"credentialID\":\"credential3\",\"credentialName\":\"credential-name-3\",\"credentialOwner\":\"owner3\",\"credentialValue\":\"credential-value-3\"},"
-                        + "{\"credentialID\":\"credential4\",\"credentialName\":\"credential-name-4\",\"credentialOwner\":\"owner4\",\"credentialValue\":\"credential-value-4\"},"
-                        + "{\"credentialID\":\"credential5\",\"credentialName\":\"credential-name-5\",\"credentialOwner\":\"owner5\",\"credentialValue\":\"credential-value-5\"},"
-                        + "{\"credentialID\":\"credential6\",\"credentialName\":\"credential-name-6\",\"credentialOwner\":\"owner6\",\"credentialValue\":\"credential-value-6\"}]"
+                "[{\"credentialID\":\"credential1\",\"credentialName\":\"credential-name-1\",\"credentialOwner\":\"owner1\",\"credentialValue\":\"credential-value-1\"}]"
         );
     }
 
@@ -225,7 +220,7 @@ public final class CredentialTransferTest {
             when(stub.getStringState("credential1"))
                     .thenReturn("{ \"credentialID\": \"credential1\", \"owner\": \"owner1\", \"credentialValue\": \"credential-value-1\" }");
 
-            Credential credential = contract.UpdateCredential(ctx, "credential1", "credential-name-1", "owner1", "credential-value-New");
+            Credential credential = contract.UpdateCredential(ctx, "credential1", "owner1", "credential-name-1", "credential-value-New");
 
             assertThat(credential).isEqualTo(new Credential("credential1", "credential-name-1", "owner1", "credential-value-New"));
         }
@@ -243,7 +238,7 @@ public final class CredentialTransferTest {
             when(stub.getStringState("credential1")).thenReturn("");
 
             Throwable thrown = catchThrowable(() -> {
-                contract.DeleteCredential(ctx, "credential1");
+                contract.DeleteCredential(ctx, "credential1", "");
             });
 
             assertThat(thrown).isInstanceOf(ChaincodeException.class).hasNoCause()

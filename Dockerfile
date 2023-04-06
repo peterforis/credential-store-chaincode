@@ -1,19 +1,13 @@
-# the first stage 
 FROM gradle:jdk11-alpine AS GRADLE_BUILD
 
-# copy the build.gradle and src code to the container
 COPY src/ src/
 COPY build.gradle ./ 
 
-# Build and package our code
 RUN gradle --no-daemon build shadowJar -x checkstyleMain -x checkstyleTest
 
-
-# the second stage of our build just needs the compiled files
 FROM openjdk:11-jre
 ARG CC_SERVER_PORT=9999
 
-# Setup tini to work better handle signals
 ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini

@@ -40,12 +40,12 @@ public final class CredentialTransfer implements ContractInterface {
     public void InitLedger(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
 
-        CreateCredential(ctx, "credential1", "credential-name-1", "owner1", "credential-value-1");
-        CreateCredential(ctx, "credential2", "credential-name-2", "owner2", "credential-value-2");
-        CreateCredential(ctx, "credential3", "credential-name-3", "owner3", "credential-value-3");
-        CreateCredential(ctx, "credential4", "credential-name-4", "owner4", "credential-value-4");
-        CreateCredential(ctx, "credential5", "credential-name-5", "owner5", "credential-value-5");
-        CreateCredential(ctx, "credential6", "credential-name-6", "owner6", "credential-value-6");
+        CreateCredential(ctx, "credential1", "owner1", "credential-name-1", "credential-value-1");
+        CreateCredential(ctx, "credential2", "owner2", "credential-name-2", "credential-value-2");
+        CreateCredential(ctx, "credential3", "owner3", "credential-name-3", "credential-value-3");
+        CreateCredential(ctx, "credential4", "owner4", "credential-name-4", "credential-value-4");
+        CreateCredential(ctx, "credential5", "owner5", "credential-name-5", "credential-value-5");
+        CreateCredential(ctx, "credential6", "owner6", "credential-name-6", "credential-value-6");
     }
 
     /**
@@ -58,17 +58,15 @@ public final class CredentialTransfer implements ContractInterface {
      * @return the created credential
      */
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public Credential CreateCredential(final Context ctx, final String credentialID, final String credentialName, final String credentialOwner, final String credentialValue) {
+    public Credential CreateCredential(final Context ctx, final String credentialID, final String credentialOwner, final String credentialName, final String credentialValue) {
         ChaincodeStub stub = ctx.getStub();
 
-        if (CredentialExists(ctx, credentialID)) {
+        if (CredentialExists(ctx, credentialID, credentialOwner)) {
             String errorMessage = String.format("Credential %s already exists", credentialID);
-            System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_ALREADY_EXISTS.toString());
         }
         Credential credential = new Credential(credentialID, credentialName, credentialOwner, credentialValue);
         String sortedJson = genson.serialize(credential);
-        System.out.println(sortedJson);
         stub.putStringState(credentialID, sortedJson);
         return credential;
     }
@@ -81,15 +79,12 @@ public final class CredentialTransfer implements ContractInterface {
      * @return the credential found on the ledger if there was one
      */
     @Transaction(intent = Transaction.TYPE.EVALUATE)
-    public Credential ReadCredential(final Context ctx, final String credentialID) {
-//        String initiatorName = getInitiator(ctx);
-
+    public Credential ReadCredential(final Context ctx, final String credentialID, final String credentialOwner) {
         ChaincodeStub stub = ctx.getStub();
         String credentialJSON = stub.getStringState(credentialID);
 
         if (credentialJSON == null || credentialJSON.isEmpty()) {
             String errorMessage = String.format("Credential %s does not exist", credentialID);
-            System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_NOT_FOUND.toString());
         }
 
@@ -106,14 +101,11 @@ public final class CredentialTransfer implements ContractInterface {
      * @return the transferred credential
      */
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public Credential UpdateCredential(final Context ctx, final String credentialID, final String credentialName, final String credentialOwner, final String credentialValue) {
-//        String initiatorName = getInitiator(ctx);
-
+    public Credential UpdateCredential(final Context ctx, final String credentialID, final String credentialOwner, final String credentialName, final String credentialValue) {
         ChaincodeStub stub = ctx.getStub();
 
-        if (!CredentialExists(ctx, credentialID)) {
+        if (!CredentialExists(ctx, credentialID, credentialOwner)) {
             String errorMessage = String.format("Credential %s does not exist", credentialID);
-            System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_NOT_FOUND.toString());
         }
 
@@ -130,14 +122,11 @@ public final class CredentialTransfer implements ContractInterface {
      * @param credentialID the ID of the credential being deleted
      */
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public void DeleteCredential(final Context ctx, final String credentialID) {
-//        String initiatorName = getInitiator(ctx);
-
+    public void DeleteCredential(final Context ctx, final String credentialID, final String credentialOwner) {
         ChaincodeStub stub = ctx.getStub();
 
-        if (!CredentialExists(ctx, credentialID)) {
+        if (!CredentialExists(ctx, credentialID, credentialOwner)) {
             String errorMessage = String.format("Credential %s does not exist", credentialID);
-            System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage, CredentialTransferError.CREDENTIAL_NOT_FOUND.toString());
         }
 
@@ -152,9 +141,7 @@ public final class CredentialTransfer implements ContractInterface {
      * @return boolean indicating the existence of the credential
      */
     @Transaction(intent = Transaction.TYPE.EVALUATE)
-    public boolean CredentialExists(final Context ctx, final String credentialID) {
-//        String initiatorName = getInitiator(ctx);
-
+    public boolean CredentialExists(final Context ctx, final String credentialID, final String credentialOwner) {
         ChaincodeStub stub = ctx.getStub();
         String credentialJSON = stub.getStringState(credentialID);
 
@@ -168,9 +155,7 @@ public final class CredentialTransfer implements ContractInterface {
      * @return array of credentials found on the ledger
      */
     @Transaction(intent = Transaction.TYPE.EVALUATE)
-    public String GetAllCredentials(final Context ctx) {
-//        String initiatorName = getInitiator(ctx);
-
+    public String GetAllCredentials(final Context ctx, final String credentialOwner) {
         ChaincodeStub stub = ctx.getStub();
 
         List<Credential> queryResults = new ArrayList<Credential>();
@@ -178,41 +163,13 @@ public final class CredentialTransfer implements ContractInterface {
 
         for (KeyValue result : results) {
             Credential credential = genson.deserialize(result.getStringValue(), Credential.class);
-            System.out.println(credential);
-            queryResults.add(credential);
+            if (credential.getCredentialOwner().equals(credentialOwner)) {
+                queryResults.add(credential);
+            }
         }
+
         final String response = genson.serialize(queryResults);
 
         return response;
     }
-
-//    public String getInitiator(final Context ctx) {
-//        try {
-//            ChaincodeStub stub = ctx.getStub();
-//            Identities.SerializedIdentity identity = Identities.SerializedIdentity.parseFrom(stub.getCreator());
-//            StringReader reader = new StringReader(identity.getIdBytes().toStringUtf8());
-//            PemReader pemReader = new PemReader(reader);
-//            byte[] x509Data = pemReader.readPemObject().getContent();
-//            CertificateFactory factory = CertificateFactory.getInstance("X509");
-//            X509Certificate principalCert = (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(x509Data));
-//
-//            Principal principal = principalCert.getSubjectDN();
-//
-//            int start = principal.getName().indexOf("CN");
-//            String tmpName, name = "";
-//            if (start > 0) {
-//                tmpName = principal.getName().substring(start + 3);
-//                int end = tmpName.indexOf(",");
-//                if (end > 0) {
-//                    name = tmpName.substring(0, end);
-//                } else {
-//                    name = tmpName;
-//                }
-//            }
-//            return name;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 }
